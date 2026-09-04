@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+
+    <!-- ================================================================= -->
+    <!-- WORKFLOWS SIMPLES (1 seule étape, réutilisés par plusieurs         -->
+    <!-- catégories : Emprunt de matériel, Approbation générale, Location de véhicule) -->
+    <!-- ================================================================= -->
+
+    <record id="demo_workflow_manager_only" model="approval.workflow">
+        <field name="name">Approbation manager uniquement</field>
+        <field name="validation_type">sequential</field>
+        <field name="active">True</field>
+        <field name="description">
+            Validation à un seul niveau par le manager. Utilisé pour les
+            demandes simples et peu risquées.
+        </field>
+    </record>
+
+    <record id="demo_stage_manager_only_1" model="approval.stage">
+        <field name="name">Approbation manager</field>
+        <field name="workflow_id" ref="demo_workflow_manager_only"/>
+        <field name="sequence">10</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+
+    <!-- ================================================================= -->
+    <!-- DÉPLACEMENT PROFESSIONNEL                                        -->
+    <!-- ================================================================= -->
+
+    <record id="demo_workflow_business_trip" model="approval.workflow">
+        <field name="name">Approbation déplacement professionnel</field>
+        <field name="validation_type">sequential</field>
+        <field name="active">True</field>
+        <field name="description">
+            Validation en 2 étapes : le manager direct, puis le service
+            financier pour le budget du déplacement.
+        </field>
+    </record>
+
+    <record id="demo_stage_trip_manager" model="approval.stage">
+        <field name="name">Approbation manager</field>
+        <field name="workflow_id" ref="demo_workflow_business_trip"/>
+        <field name="sequence">10</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_stage_trip_finance" model="approval.stage">
+        <field name="name">Approbation finance</field>
+        <field name="workflow_id" ref="demo_workflow_business_trip"/>
+        <field name="sequence">20</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_category_business_trip" model="approval.category">
+        <field name="name">Déplacement professionnel</field>
+        <field name="code">BUSINESS_TRIP</field>
+        <field name="sequence">10</field>
+        <field name="icon">fa-plane</field>
+        <field name="color">1</field>
+        <field name="workflow_id" ref="demo_workflow_business_trip"/>
+        <field name="description">
+            Demandes de déplacement professionnel : transport, hôtel,
+            per diem.
+        </field>
+        <field name="active">True</field>
+    </record>
+
+
+    <!-- ================================================================= -->
+    <!-- EMPRUNT DE MATÉRIEL                                              -->
+    <!-- ================================================================= -->
+
+    <record id="demo_category_borrow_items" model="approval.category">
+        <field name="name">Emprunt de matériel</field>
+        <field name="code">BORROW_ITEMS</field>
+        <field name="sequence">20</field>
+        <field name="icon">fa-cubes</field>
+        <field name="color">5</field>
+        <field name="workflow_id" ref="demo_workflow_manager_only"/>
+        <field name="description">
+            Emprunt de matériel interne (ordinateur, vidéoprojecteur,
+            véhicule de service, etc.).
+        </field>
+        <field name="active">True</field>
+    </record>
+
+
+    <!-- ================================================================= -->
+    <!-- APPROBATION GÉNÉRALE                                             -->
+    <!-- ================================================================= -->
+
+    <record id="demo_category_general_approval" model="approval.category">
+        <field name="name">Approbation générale</field>
+        <field name="code">GENERAL_APPROVAL</field>
+        <field name="sequence">30</field>
+        <field name="icon">fa-check-square-o</field>
+        <field name="color">0</field>
+        <field name="workflow_id" ref="demo_workflow_manager_only"/>
+        <field name="description">
+            Catégorie générique pour toute demande ne correspondant à
+            aucun autre type spécifique.
+        </field>
+        <field name="active">True</field>
+    </record>
+
+
+    <!-- ================================================================= -->
+    <!-- APPROBATION DE CONTRAT                                           -->
+    <!-- ================================================================= -->
+
+    <record id="demo_workflow_contract" model="approval.workflow">
+        <field name="name">Approbation de contrat</field>
+        <field name="validation_type">sequential</field>
+        <field name="active">True</field>
+        <field name="description">
+            Validation en 3 étapes : relecture juridique, manager, puis
+            direction pour signature finale.
+        </field>
+    </record>
+
+    <record id="demo_stage_contract_legal" model="approval.stage">
+        <field name="name">Relecture juridique</field>
+        <field name="workflow_id" ref="demo_workflow_contract"/>
+        <field name="sequence">10</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_stage_contract_manager" model="approval.stage">
+        <field name="name">Approbation manager</field>
+        <field name="workflow_id" ref="demo_workflow_contract"/>
+        <field name="sequence">20</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_stage_contract_director" model="approval.stage">
+        <field name="name">Approbation direction</field>
+        <field name="workflow_id" ref="demo_workflow_contract"/>
+        <field name="sequence">30</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_category_contract_approval" model="approval.category">
+        <field name="name">Approbation de contrat</field>
+        <field name="code">CONTRACT_APPROVAL</field>
+        <field name="sequence">40</field>
+        <field name="icon">fa-file-text-o</field>
+        <field name="color">4</field>
+        <field name="workflow_id" ref="demo_workflow_contract"/>
+        <field name="description">
+            Validation des contrats commerciaux et fournisseurs avant
+            signature.
+        </field>
+        <field name="active">True</field>
+    </record>
+
+
+    <!-- ================================================================= -->
+    <!-- DEMANDE DE PAIEMENT                                              -->
+    <!-- Deux workflows + une règle conditionnelle sur le montant :        -->
+    <!--   - montant &lt; 5000  -&gt; workflow standard (Finance uniquement) -->
+    <!--   - montant &gt;= 5000 -&gt; workflow renforcé (Finance + Direction) -->
+    <!-- ================================================================= -->
+
+    <record id="demo_workflow_payment_standard" model="approval.workflow">
+        <field name="name">Approbation paiement - Standard</field>
+        <field name="validation_type">sequential</field>
+        <field name="active">True</field>
+        <field name="description">
+            Workflow par défaut pour les paiements de faible montant :
+            validation financière uniquement.
+        </field>
+    </record>
+
+    <record id="demo_stage_payment_standard_finance" model="approval.stage">
+        <field name="name">Approbation finance</field>
+        <field name="workflow_id" ref="demo_workflow_payment_standard"/>
+        <field name="sequence">10</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_workflow_payment_high" model="approval.workflow">
+        <field name="name">Approbation paiement - Montant élevé</field>
+        <field name="validation_type">sequential</field>
+        <field name="active">True</field>
+        <field name="description">
+            Workflow renforcé déclenché automatiquement par une règle
+            quand le montant du paiement est élevé : finance puis
+            direction.
+        </field>
+    </record>
+
+    <record id="demo_stage_payment_high_finance" model="approval.stage">
+        <field name="name">Approbation finance</field>
+        <field name="workflow_id" ref="demo_workflow_payment_high"/>
+        <field name="sequence">10</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_stage_payment_high_director" model="approval.stage">
+        <field name="name">Approbation direction</field>
+        <field name="workflow_id" ref="demo_workflow_payment_high"/>
+        <field name="sequence">20</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_category_payment_application" model="approval.category">
+        <field name="name">Demande de paiement</field>
+        <field name="code">PAYMENT_APPLICATION</field>
+        <field name="sequence">50</field>
+        <field name="icon">fa-credit-card</field>
+        <field name="color">6</field>
+        <field name="workflow_id" ref="demo_workflow_payment_standard"/>
+        <field name="description">
+            Demandes de paiement fournisseur. Workflow déterminé
+            automatiquement selon le montant (voir Configuration &gt;
+            Règles).
+        </field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_rule_payment_high" model="approval.rule">
+        <field name="name">Paiement &gt;= 5000 -&gt; validation renforcée</field>
+        <field name="sequence">10</field>
+        <field name="category_id" ref="demo_category_payment_application"/>
+        <field name="workflow_id" ref="demo_workflow_payment_high"/>
+        <field name="amount_operator">&gt;=</field>
+        <field name="amount_value">5000</field>
+        <field name="active">True</field>
+    </record>
+
+
+    <!-- ================================================================= -->
+    <!-- DEMANDE DE LOCATION DE VÉHICULE                                  -->
+    <!-- ================================================================= -->
+
+    <record id="demo_category_car_rental" model="approval.category">
+        <field name="name">Demande de location de véhicule</field>
+        <field name="code">CAR_RENTAL</field>
+        <field name="sequence">60</field>
+        <field name="icon">fa-car</field>
+        <field name="color">2</field>
+        <field name="workflow_id" ref="demo_workflow_manager_only"/>
+        <field name="description">
+            Demandes de location de véhicule pour un déplacement
+            professionnel.
+        </field>
+        <field name="active">True</field>
+    </record>
+
+
+    <!-- ================================================================= -->
+    <!-- PRIME DE COOPTATION                                              -->
+    <!-- ================================================================= -->
+
+    <record id="demo_workflow_job_referral" model="approval.workflow">
+        <field name="name">Approbation prime de cooptation</field>
+        <field name="validation_type">sequential</field>
+        <field name="active">True</field>
+        <field name="description">
+            Validation en 2 étapes pour l'octroi d'une prime de
+            cooptation : RH, puis manager.
+        </field>
+    </record>
+
+    <record id="demo_stage_referral_hr" model="approval.stage">
+        <field name="name">Approbation RH</field>
+        <field name="workflow_id" ref="demo_workflow_job_referral"/>
+        <field name="sequence">10</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_stage_referral_manager" model="approval.stage">
+        <field name="name">Approbation manager</field>
+        <field name="workflow_id" ref="demo_workflow_job_referral"/>
+        <field name="sequence">20</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_category_job_referral" model="approval.category">
+        <field name="name">Prime de cooptation</field>
+        <field name="code">JOB_REFERRAL</field>
+        <field name="sequence">70</field>
+        <field name="icon">fa-handshake-o</field>
+        <field name="color">7</field>
+        <field name="workflow_id" ref="demo_workflow_job_referral"/>
+        <field name="description">
+            Demande de prime de cooptation suite au recrutement d'un
+            candidat référé par un employé.
+        </field>
+        <field name="active">True</field>
+    </record>
+
+
+    <!-- ================================================================= -->
+    <!-- ACHAT                                                             -->
+    <!-- Même logique que Demande de paiement : règle sur le montant.      -->
+    <!-- ================================================================= -->
+
+    <record id="demo_workflow_procurement_standard" model="approval.workflow">
+        <field name="name">Approbation achat - Standard</field>
+        <field name="validation_type">sequential</field>
+        <field name="active">True</field>
+        <field name="description">
+            Workflow par défaut pour les achats courants : validation
+            du manager uniquement.
+        </field>
+    </record>
+
+    <record id="demo_stage_procurement_standard_manager" model="approval.stage">
+        <field name="name">Approbation manager</field>
+        <field name="workflow_id" ref="demo_workflow_procurement_standard"/>
+        <field name="sequence">10</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_workflow_procurement_high" model="approval.workflow">
+        <field name="name">Approbation achat - Montant élevé</field>
+        <field name="validation_type">sequential</field>
+        <field name="active">True</field>
+        <field name="description">
+            Workflow renforcé déclenché automatiquement par une règle
+            pour les achats importants : manager, finance, puis
+            direction.
+        </field>
+    </record>
+
+    <record id="demo_stage_procurement_high_manager" model="approval.stage">
+        <field name="name">Approbation manager</field>
+        <field name="workflow_id" ref="demo_workflow_procurement_high"/>
+        <field name="sequence">10</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_stage_procurement_high_finance" model="approval.stage">
+        <field name="name">Approbation finance</field>
+        <field name="workflow_id" ref="demo_workflow_procurement_high"/>
+        <field name="sequence">20</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_stage_procurement_high_director" model="approval.stage">
+        <field name="name">Approbation direction</field>
+        <field name="workflow_id" ref="demo_workflow_procurement_high"/>
+        <field name="sequence">30</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_category_procurement" model="approval.category">
+        <field name="name">Achat</field>
+        <field name="code">PROCUREMENT</field>
+        <field name="sequence">80</field>
+        <field name="icon">fa-shopping-cart</field>
+        <field name="color">3</field>
+        <field name="workflow_id" ref="demo_workflow_procurement_standard"/>
+        <field name="description">
+            Demandes d'achat de biens ou de services. Workflow
+            déterminé automatiquement selon le montant (voir
+            Configuration &gt; Règles).
+        </field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_rule_procurement_high" model="approval.rule">
+        <field name="name">Achat &gt;= 20000 -&gt; validation renforcée</field>
+        <field name="sequence">10</field>
+        <field name="category_id" ref="demo_category_procurement"/>
+        <field name="workflow_id" ref="demo_workflow_procurement_high"/>
+        <field name="amount_operator">&gt;=</field>
+        <field name="amount_value">20000</field>
+        <field name="active">True</field>
+    </record>
+
+
+    <!-- ================================================================= -->
+    <!-- DEMANDE DE CONGÉ                                                 -->
+    <!-- ================================================================= -->
+
+    <record id="demo_workflow_leave" model="approval.workflow">
+        <field name="name">Approbation demande de congé</field>
+        <field name="validation_type">parallel</field>
+        <field name="active">True</field>
+        <field name="description">
+            Validation RH puis manager pour les demandes de congé.
+        </field>
+    </record>
+
+    <record id="demo_stage_leave_hr" model="approval.stage">
+        <field name="name">Validation RH</field>
+        <field name="workflow_id" ref="demo_workflow_leave"/>
+        <field name="sequence">10</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_stage_leave_manager" model="approval.stage">
+        <field name="name">Validation manager</field>
+        <field name="workflow_id" ref="demo_workflow_leave"/>
+        <field name="sequence">20</field>
+        <field name="approver_type">user</field>
+        <field name="approver_user_id" ref="base.user_admin"/>
+        <field name="min_approvals">1</field>
+        <field name="is_blocking">True</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="demo_category_leave" model="approval.category">
+        <field name="name">Demande de congé</field>
+        <field name="code">LEAVE_REQUEST</field>
+        <field name="sequence">90</field>
+        <field name="icon">fa-calendar</field>
+        <field name="color">1</field>
+        <field name="workflow_id" ref="demo_workflow_leave"/>
+        <field name="description">
+            Demandes de congé payé, sans solde ou exceptionnel.
+        </field>
+        <field name="active">True</field>
+    </record>
+
+
+    <!-- ================================================================= -->
+    <!-- DEMANDES D'EXEMPLE                                                -->
+    <!-- Certaines restent en brouillon pour que vous puissiez tester      -->
+    <!-- Submit/Approve vous-même. Deux sont déjà soumises via <function>  -->
+    <!-- pour montrer le Dashboard et Manager avec des données réelles.    -->
+    <!-- ================================================================= -->
+
+    <record id="demo_request_business_trip_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="demo_category_business_trip"/>
+        <field name="amount">3500.0</field>
+        <field name="description">
+            Déplacement client - Casablanca / Paris (billet + hôtel
+            3 nuits).
+        </field>
+    </record>
+
+    <record id="demo_request_borrow_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="demo_category_borrow_items"/>
+        <field name="amount">0.0</field>
+        <field name="description">
+            Emprunt d'un vidéoprojecteur pour une présentation client.
+        </field>
+    </record>
+
+    <record id="demo_request_payment_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="demo_category_payment_application"/>
+        <field name="amount">7500.0</field>
+        <field name="description">
+            Paiement fournisseur - facture F-2026-0456. Montant
+            supérieur à 5000, la règle affecte automatiquement le
+            workflow renforcé (Finance + Direction).
+        </field>
+    </record>
+
+    <record id="demo_request_procurement_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="demo_category_procurement"/>
+        <field name="amount">1200.0</field>
+        <field name="description">
+            Achat de fournitures de bureau. Montant sous le seuil de
+            20000, le workflow standard (Manager uniquement)
+            s'applique.
+        </field>
+    </record>
+
+    <record id="demo_request_leave_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="demo_category_leave"/>
+        <field name="amount">0.0</field>
+        <field name="description">
+            Congé annuel - 5 jours ouvrés.
+        </field>
+    </record>
+
+    <!-- Soumission automatique de 2 demandes pour peupler Dashboard et
+         Manager dès l'installation. Les autres restent en brouillon. -->
+
+    <function model="approval.request" name="action_submit">
+        <value eval="[ref('demo_request_payment_1')]"/>
+    </function>
+
+    <function model="approval.request" name="action_submit">
+        <value eval="[ref('demo_request_procurement_1')]"/>
+    </function>
+
+    </data>
+</odoo>

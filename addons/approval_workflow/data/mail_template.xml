@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- =================================================== -->
+        <!-- Email envoyé à l'approbateur quand une demande       -->
+        <!-- arrive à son étape                                   -->
+        <!-- =================================================== -->
+        <record id="mail_template_approval_pending" model="mail.template">
+            <field name="name">Approbation — Demande à valider</field>
+            <field name="model_id" ref="model_approval_request"/>
+            <field name="subject">Validation requise : {{ object.name }}</field>
+            <!-- Le vrai destinataire (approbateur de l'étape courante) est
+                 injecté dynamiquement par le code Python via
+                 recipient_ids/email_to lors de l'appel à send_mail
+                 (voir approval.request._notify_approvers). Cette valeur
+                 sert uniquement de repli si le template est utilisé
+                 manuellement depuis le chatter. -->
+            <field name="email_to">{{ object.current_stage_id.approver_user_id.email or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+                    <p>Bonjour,</p>
+                    <p>
+                        Une demande requiert votre validation :
+                    </p>
+                    <table style="border-collapse: collapse; margin: 12px 0;">
+                        <tr>
+                            <td style="padding: 4px 8px; font-weight: bold;">Référence</td>
+                            <td style="padding: 4px 8px;" t-out="object.name"/>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 8px; font-weight: bold;">Demandeur</td>
+                            <td style="padding: 4px 8px;" t-out="object.employee_id.name"/>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 8px; font-weight: bold;">Catégorie</td>
+                            <td style="padding: 4px 8px;" t-out="object.category_id.name"/>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 8px; font-weight: bold;">Étape</td>
+                            <td style="padding: 4px 8px;" t-out="object.current_stage_id.name"/>
+                        </tr>
+                        <tr t-if="object.amount">
+                            <td style="padding: 4px 8px; font-weight: bold;">Montant</td>
+                            <td style="padding: 4px 8px;">
+                                <t t-out="object.amount"/> <t t-out="object.currency_id.symbol"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <p>
+                        Merci de vous connecter à Odoo pour approuver ou refuser
+                        cette demande.
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <!-- =================================================== -->
+        <!-- Email envoyé au demandeur quand sa demande est       -->
+        <!-- approuvée (toutes étapes validées)                   -->
+        <!-- =================================================== -->
+        <record id="mail_template_approval_approved" model="mail.template">
+            <field name="name">Approbation — Demande approuvée</field>
+            <field name="model_id" ref="model_approval_request"/>
+            <field name="subject">Votre demande {{ object.name }} a été approuvée</field>
+            <!-- Destinataire dynamique = le demandeur réel (requester_id),
+                 surchargé côté Python via recipient_ids lors de l'envoi. -->
+            <field name="email_to">{{ object.requester_id.email or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+                    <p>Bonjour <t t-out="object.requester_id.name"/>,</p>
+                    <p>
+                        Votre demande <strong t-out="object.name"/>
+                        (<t t-out="object.category_id.name"/>) a été
+                        <strong style="color: #2E8B8B;">approuvée</strong>
+                        par l'ensemble des approbateurs du circuit de validation.
+                    </p>
+                    <p>Cordialement,<br/>Le système d'approbation</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- =================================================== -->
+        <!-- Email envoyé au demandeur quand sa demande est       -->
+        <!-- refusée                                              -->
+        <!-- =================================================== -->
+        <record id="mail_template_approval_refused" model="mail.template">
+            <field name="name">Approbation — Demande refusée</field>
+            <field name="model_id" ref="model_approval_request"/>
+            <field name="subject">Votre demande {{ object.name }} a été refusée</field>
+            <!-- Destinataire dynamique = le demandeur réel (requester_id),
+                 surchargé côté Python via recipient_ids lors de l'envoi. -->
+            <field name="email_to">{{ object.requester_id.email or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+                    <p>Bonjour <t t-out="object.requester_id.name"/>,</p>
+                    <p>
+                        Votre demande <strong t-out="object.name"/>
+                        (<t t-out="object.category_id.name"/>) a été
+                        <strong style="color: #C0392B;">refusée</strong>.
+                    </p>
+                    <p t-if="object.reason">
+                        <strong>Motif du refus :</strong>
+                        <t t-out="object.reason"/>
+                    </p>
+                    <p t-else="">
+                        Consultez le chatter de la demande dans Odoo pour
+                        connaître le motif du refus.
+                    </p>
+                    <p>Cordialement,<br/>Le système d'approbation</p>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

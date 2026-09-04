@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- =================================================== -->
+        <!-- Entrée dans le menu du portail client (/my)           -->
+        <!-- =================================================== -->
+        <template id="portal_my_home_approval" name="Portail : entrée Demandes"
+                  inherit_id="portal.portal_my_home" priority="30">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-call="portal.portal_docs_entry">
+                    <t t-set="title">Mes demandes d'approbation</t>
+                    <t t-set="url" t-value="'/my/approval_requests'"/>
+                    <t t-set="count" t-value="approval_count"/>
+                </t>
+            </xpath>
+        </template>
+
+        <!-- =================================================== -->
+        <!-- Liste des demandes (portail)                          -->
+        <!-- =================================================== -->
+        <template id="portal_my_approval_requests" name="Portail : mes demandes">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+                <div class="o_portal_my_doc_table">
+                    <table class="table table-hover o_portal_my_doc_table" t-if="requests">
+                        <thead>
+                            <tr class="active">
+                                <th>Référence</th>
+                                <th>Catégorie</th>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>État</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="requests" t-as="req">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/approval_requests/#{req.id}">
+                                            <t t-out="req.name"/>
+                                        </a>
+                                    </td>
+                                    <td><t t-out="req.category_id.name"/></td>
+                                    <td><t t-out="req.date_request"/></td>
+                                    <td>
+                                        <t t-if="req.amount" t-out="req.amount"/>
+                                        <t t-out="req.currency_id.symbol"/>
+                                    </td>
+                                    <td>
+                                        <span t-attf-class="badge text-bg-#{req.state == 'approved' and 'success' or (req.state == 'refused' and 'danger' or 'info')}">
+                                            <t t-out="req.state"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <p t-else="">Vous n'avez soumis aucune demande pour le moment.</p>
+                    <t t-call="portal.pager"/>
+                </div>
+            </t>
+        </template>
+
+        <!-- =================================================== -->
+        <!-- Détail d'une demande (portail)                        -->
+        <!-- =================================================== -->
+        <template id="portal_approval_request_detail" name="Portail : détail demande">
+            <t t-call="portal.portal_layout">
+                <div class="container">
+                    <h3>
+                        <t t-out="approval_request.name"/> —
+                        <span t-out="approval_request.category_id.name"/>
+                    </h3>
+                    <p><strong>État :</strong> <t t-out="approval_request.state"/></p>
+                    <p><strong>Étape actuelle :</strong> <t t-out="approval_request.current_stage_id.name or '—'"/></p>
+                    <p t-if="approval_request.amount">
+                        <strong>Montant :</strong> <t t-out="approval_request.amount"/>
+                        <t t-out="approval_request.currency_id.symbol"/>
+                    </p>
+                    <p><strong>Description :</strong></p>
+                    <p t-out="approval_request.description or '—'"/>
+                    <a href="/my/approval_requests" class="btn btn-secondary">
+                        Retour à mes demandes
+                    </a>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</odoo>

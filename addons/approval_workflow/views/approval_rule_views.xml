@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- =================================================== -->
+        <!-- Vue Liste                                             -->
+        <!-- =================================================== -->
+        <record id="view_approval_rule_list" model="ir.ui.view">
+            <field name="name">approval.rule.list</field>
+            <field name="model">approval.rule</field>
+            <field name="arch" type="xml">
+                <list string="Règles de sélection de workflow">
+                    <field name="category_id"/>
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="condition_field"/>
+                    <field name="amount_operator"/>
+                    <field name="amount_value"/>
+                    <field name="department_id"/>
+                    <field name="job_id"/>
+                    <field name="workflow_id"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- =================================================== -->
+        <!-- Vue Formulaire                                        -->
+        <!-- =================================================== -->
+        <record id="view_approval_rule_form" model="ir.ui.view">
+            <field name="name">approval.rule.form</field>
+            <field name="model">approval.rule</field>
+            <field name="arch" type="xml">
+                <form string="Règle de sélection de workflow">
+                    <sheet>
+                        <widget name="web_ribbon" title="Archivé" bg_color="text-bg-danger"
+                                invisible="active"/>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1>
+                                <field name="name" placeholder="ex. Achat &gt;= 1000 MAD"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Application">
+                                <field name="category_id"/>
+                                <field name="sequence"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="active" invisible="1"/>
+                            </group>
+                            <group string="Workflow déclenché">
+                                <field name="workflow_id"/>
+                            </group>
+                        </group>
+                        <group string="Conditions (toutes optionnelles, cumulatives)">
+                            <group string="Mesure">
+                                <field name="condition_field"/>
+                                <field name="amount_operator"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="amount_value"
+                                       invisible="amount_operator == 'none'"
+                                       string="Valeur"/>
+                                <field name="amount_value_to"
+                                       invisible="amount_operator != 'between'"
+                                       string="Valeur (borne haute)"/>
+                            </group>
+                            <group string="Organisation">
+                                <field name="department_id"/>
+                                <field name="job_id"/>
+                                <field name="training_type_value"/>
+                                <field name="stock_location_id"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- =================================================== -->
+        <!-- Vue Recherche                                         -->
+        <!-- =================================================== -->
+        <record id="view_approval_rule_search" model="ir.ui.view">
+            <field name="name">approval.rule.search</field>
+            <field name="model">approval.rule</field>
+            <field name="arch" type="xml">
+                <search string="Rechercher une règle">
+                    <field name="name"/>
+                    <field name="category_id"/>
+                    <field name="workflow_id"/>
+                    <field name="department_id"/>
+                    <filter string="Archivées" name="filter_inactive"
+                            domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Regrouper par">
+                        <filter string="Catégorie" name="group_category"
+                                context="{'group_by': 'category_id'}"/>
+                        <filter string="Workflow" name="group_workflow"
+                                context="{'group_by': 'workflow_id'}"/>
+                        <filter string="Département" name="group_department"
+                                context="{'group_by': 'department_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- =================================================== -->
+        <!-- Action de fenêtre                                     -->
+        <!-- =================================================== -->
+        <record id="action_approval_rule" model="ir.actions.act_window">
+            <field name="name">Règles de sélection de workflow</field>
+            <field name="res_model">approval.rule</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_approval_rule_search"/>
+            <field name="context">{'search_default_group_category': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smart_action">
+                    Créez votre première règle
+                </p>
+                <p>
+                    Une règle détermine automatiquement quel workflow
+                    appliquer à une demande selon des critères comme le
+                    montant, le département ou le poste. Les règles d'une
+                    même catégorie sont évaluées dans l'ordre : la première
+                    qui correspond l'emporte.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

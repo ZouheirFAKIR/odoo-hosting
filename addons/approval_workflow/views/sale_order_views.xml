@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="view_order_form_inherit_approval" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.approval</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+
+                <button
+                    name="action_submit_for_approval"
+                    type="object"
+                    string="Soumettre pour approbation"
+                    class="btn-primary"
+                    invisible="state != 'draft' or approval_state in ('draft', 'in_progress')"/>
+
+            </xpath>
+
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+
+                <button
+                    name="action_view_approval_request"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-check-square-o"
+                    invisible="not approval_request_id">
+
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Approbation</span>
+                        <field name="approval_state" class="o_stat_value"/>
+                    </div>
+
+                </button>
+
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

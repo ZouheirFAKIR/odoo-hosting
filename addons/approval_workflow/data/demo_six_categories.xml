@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+
+    <!-- =================================================================
+         DONNEES DE DEMONSTRATION UNIQUEMENT (cle "demo" du manifest)
+
+         La configuration (categories/workflows/stages/rules) est
+         maintenant dans data/categories_business.xml (donnees
+         regulieres, toujours chargees). Ce fichier-ci ne contient
+         plus que des ENREGISTREMENTS DEXEMPLE : un produit demo et
+         6 demandes deja soumises, pour visualiser le dashboard
+         rempli des installation quand les donnees de demo sont
+         activees.
+    ================================================================= -->
+
+    <!-- DEMANDES D'EXEMPLE (cahier des charges, section 16)               -->
+    <!-- ================================================================= -->
+
+    <!-- Achat : Demande d'achat informatique - Montant : 8500 DH ->      -->
+    <!-- doit déclencher "Responsable + Achats" (entre 2000 et 10000)     -->
+
+    <record id="demo_product_laptop_pfe" model="product.product">
+        <field name="name">Ordinateur portable - Poste développeur</field>
+        <field name="type">consu</field>
+        <field name="list_price">8500.0</field>
+    </record>
+
+    <record id="demo_request_purchase_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="cat_purchase"/>
+        <field name="vendor_id" ref="base.res_partner_1"/>
+        <field name="requested_date">2026-09-01</field>
+        <field name="justification">
+            Renouvellement du poste de travail d'un développeur,
+            matériel actuel hors garantie.
+        </field>
+        <field name="description">Demande d'achat informatique</field>
+    </record>
+    <record id="demo_request_purchase_1_line" model="approval.request.line">
+        <field name="request_id" ref="demo_request_purchase_1"/>
+        <field name="product_id" ref="demo_product_laptop_pfe"/>
+        <field name="description">Ordinateur portable - Poste développeur</field>
+        <field name="quantity">1</field>
+        <field name="price_unit">8500.0</field>
+    </record>
+
+    <!-- Commande : Commande client importante - Montant : 15000 DH,      -->
+    <!-- remise 12% -> doit déclencher "Responsable + Direction" (montant -->
+    <!-- > 10000, priorité sur la règle de remise 10-20%)                 -->
+
+    <record id="demo_request_sale_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="cat_sale"/>
+        <field name="partner_id" ref="base.res_partner_2"/>
+        <field name="order_date">2026-08-13</field>
+        <field name="amount_untaxed">13392.0</field>
+        <field name="tax_amount">1608.0</field>
+        <field name="amount">15000.0</field>
+        <field name="discount">12.0</field>
+        <field name="description">Commande client importante</field>
+    </record>
+
+    <!-- Congé : Congé annuel du 20/08/2026 au 24/08/2026 (5 jours) ->    -->
+    <!-- doit déclencher "Manager + RH" (durée > 3 et <= 5)               -->
+
+    <record id="demo_request_leave_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="cat_leave"/>
+        <field name="date_from">2026-08-20</field>
+        <field name="date_to">2026-08-24</field>
+        <field name="location">Hors Casablanca</field>
+        <field name="reason">Congé annuel</field>
+        <field name="description">Congé annuel</field>
+    </record>
+
+    <!-- Dépense : Déplacement professionnel - Montant : 1800 DH ->       -->
+    <!-- doit déclencher "Manager + Finance" (500 < montant <= 2000)      -->
+
+    <record id="demo_request_expense_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="cat_expense"/>
+        <field name="expense_type">transport</field>
+        <field name="expense_date">2026-08-10</field>
+        <field name="amount">1800.0</field>
+        <field name="payment_method">company_card</field>
+        <field name="justification">
+            Déplacement professionnel chez un client à Rabat (train +
+            taxi + hôtel 1 nuit).
+        </field>
+        <field name="description">Déplacement professionnel</field>
+    </record>
+
+    <!-- Formation : Formation Python, coût 3500 DH, durée 3 jours,       -->
+    <!-- externe -> doit déclencher "Manager + RH" (externe, coût<=5000)  -->
+
+    <record id="demo_request_training_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="cat_training"/>
+        <field name="training_name">Formation Python avancé</field>
+        <field name="training_type">external</field>
+        <field name="vendor_id" ref="base.res_partner_3"/>
+        <field name="date_from">2026-09-01</field>
+        <field name="date_to">2026-09-03</field>
+        <field name="location">Casablanca</field>
+        <field name="amount">3500.0</field>
+        <field name="objective">Amélioration des compétences Python.</field>
+        <field name="justification">
+            Montée en compétence nécessaire pour le projet en cours.
+        </field>
+        <field name="description">Formation Python</field>
+    </record>
+
+    <!-- Stock : Transfert Casablanca -> Rabat, quantité 20 -> doit       -->
+    <!-- déclencher "Magasinier + Responsable Stock" (quantité > 10)      -->
+
+    <record id="demo_request_stock_1" model="approval.request">
+        <field name="requester_id" ref="base.user_admin"/>
+        <field name="category_id" ref="cat_stock"/>
+        <field name="source_location_id" ref="stock.stock_location_stock"/>
+        <field name="scheduled_date">2026-08-16</field>
+        <field name="reason">Réapprovisionnement du dépôt de Rabat.</field>
+        <field name="description">Transfert de stock</field>
+    </record>
+    <record id="demo_request_stock_1_line" model="approval.request.line">
+        <field name="request_id" ref="demo_request_stock_1"/>
+        <field name="product_id" ref="demo_product_laptop_pfe"/>
+        <field name="description">Ordinateur portable - Poste développeur</field>
+        <field name="quantity">20</field>
+    </record>
+
+    <!-- Soumission automatique des 6 exemples pour vérifier tout de     -->
+    <!-- suite, à l'installation, que le bon workflow est bien choisi    -->
+    <!-- par le moteur de règles pour chaque catégorie.                  -->
+
+    <function model="approval.request" name="action_submit">
+        <value eval="[ref('demo_request_purchase_1')]"/>
+    </function>
+    <function model="approval.request" name="action_submit">
+        <value eval="[ref('demo_request_sale_1')]"/>
+    </function>
+    <function model="approval.request" name="action_submit">
+        <value eval="[ref('demo_request_leave_1')]"/>
+    </function>
+    <function model="approval.request" name="action_submit">
+        <value eval="[ref('demo_request_expense_1')]"/>
+    </function>
+    <function model="approval.request" name="action_submit">
+        <value eval="[ref('demo_request_training_1')]"/>
+    </function>
+    <function model="approval.request" name="action_submit">
+        <value eval="[ref('demo_request_stock_1')]"/>
+    </function>
+
+    </data>
+</odoo>

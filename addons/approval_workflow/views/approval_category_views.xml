@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ========================================================= -->
+    <!-- VUE LISTE CATÉGORIE                                     -->
+    <!-- ========================================================= -->
+
+    <record id="view_approval_category_list" model="ir.ui.view">
+        <field name="name">approval.category.list</field>
+        <field name="model">approval.category</field>
+        <field name="arch" type="xml">
+            <list string="Catégories d'approbation">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category_type"/>
+                <field name="workflow_id"/>
+                <field name="company_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- VUE FORMULAIRE CATÉGORIE                                -->
+    <!-- ========================================================= -->
+
+    <record id="view_approval_category_form" model="ir.ui.view">
+        <field name="name">approval.category.form</field>
+        <field name="model">approval.category</field>
+        <field name="arch" type="xml">
+
+            <form string="Catégorie d'approbation">
+
+                <sheet>
+
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                        </group>
+
+                        <group>
+                            <field name="workflow_id"/>
+                            <field name="company_id"/>
+                            <field name="active"/>
+                            <field name="category_type"/>
+                            <field name="use_product_lines"/>
+                            <field name="related_model_id"/>
+                            <field name="final_action_method"
+                                   invisible="not related_model_id"/>
+                        </group>
+                    </group>
+
+                    <group string="Carte du tableau de bord">
+                        <group>
+                            <field name="icon" placeholder="fa-check-square-o"/>
+                            <field name="color"/>
+                        </group>
+                        <group>
+                            <div class="text-muted" colspan="2">
+                                Icône : tout nom de classe Font Awesome, ex.
+                                fa-plane, fa-money, fa-car, fa-shopping-cart,
+                                fa-file-text-o, fa-handshake-o.<br/>
+                                Couleur : un nombre de 0 à 7, définit la
+                                couleur d'accentuation de l'icône sur le tableau de bord.
+                            </div>
+                        </group>
+                    </group>
+
+                    <notebook>
+
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+
+            </form>
+
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- VUE RECHERCHE CATÉGORIE                                  -->
+    <!-- ========================================================= -->
+
+    <record id="view_approval_category_search" model="ir.ui.view">
+        <field name="name">approval.category.search</field>
+        <field name="model">approval.category</field>
+        <field name="arch" type="xml">
+
+            <search string="Catégories d'approbation">
+
+                <field name="name"/>
+                <field name="code"/>
+                <field name="workflow_id"/>
+                <field name="company_id"/>
+
+                <filter
+                    string="Actives"
+                    name="filter_active"
+                    domain="[('active', '=', True)]"
+                />
+
+                <filter
+                    string="Archivées"
+                    name="filter_inactive"
+                    domain="[('active', '=', False)]"
+                />
+
+                <group expand="0" string="Grouper par">
+
+                    <filter
+                        string="Workflow"
+                        name="group_workflow"
+                        context="{'group_by': 'workflow_id'}"
+                    />
+
+                    <filter
+                        string="Société"
+                        name="group_company"
+                        context="{'group_by': 'company_id'}"
+                    />
+
+                </group>
+
+            </search>
+
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- ACTION CATÉGORIE                                         -->
+    <!-- ========================================================= -->
+
+    <record id="action_approval_categories" model="ir.actions.act_window">
+        <field name="name">Catégories d'approbation</field>
+        <field name="res_model">approval.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_approval_category_list"/>
+        <field name="search_view_id" ref="view_approval_category_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première catégorie d'approbation.
+            </p>
+        </field>
+    </record>
+
+</odoo>

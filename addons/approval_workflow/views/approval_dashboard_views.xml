@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- =================================================== -->
+        <!-- Vue Formulaire — sert de tableau de bord              -->
+        <!-- (un seul enregistrement, cf. get_dashboard())         -->
+        <!-- =================================================== -->
+        <record id="view_approval_dashboard_form" model="ir.ui.view">
+            <field name="name">approval.dashboard.form</field>
+            <field name="model">approval.dashboard</field>
+            <field name="arch" type="xml">
+                <form string="Tableau de bord des approbations" create="false" edit="false" delete="false">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>Tableau de bord des approbations</h1>
+                        </div>
+
+                        <!-- KPI globaux -->
+                        <div class="o_horizontal_separator">Vue d'ensemble</div>
+                        <group col="5">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="total_count" nolabel="1"/></span>
+                                <span class="o_stat_text">Total</span>
+                            </div>
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="draft_count" nolabel="1"/></span>
+                                <span class="o_stat_text">Brouillons</span>
+                            </div>
+                            <button name="action_view_pending" type="object" class="oe_stat_button" icon="fa-clock-o">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_value"><field name="pending_count" nolabel="1"/></span>
+                                    <span class="o_stat_text">En attente</span>
+                                </div>
+                            </button>
+                            <button name="action_view_approved" type="object" class="oe_stat_button" icon="fa-check">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_value"><field name="approved_count" nolabel="1"/></span>
+                                    <span class="o_stat_text">Approuvées</span>
+                                </div>
+                            </button>
+                            <button name="action_view_refused" type="object" class="oe_stat_button" icon="fa-times">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_value"><field name="refused_count" nolabel="1"/></span>
+                                    <span class="o_stat_text">Refusées</span>
+                                </div>
+                            </button>
+                        </group>
+
+                        <!-- Délai moyen -->
+                        <div class="o_horizontal_separator">Performance</div>
+                        <group>
+                            <field name="avg_validation_hours" string="Temps moyen de validation (heures)"/>
+                        </group>
+
+                        <!-- Répartitions -->
+                        <div class="o_horizontal_separator">Répartitions</div>
+                        <group col="3">
+                            <group string="Par catégorie">
+                                <field name="category_stats" nolabel="1" widget="text"/>
+                            </group>
+                            <group string="Par département">
+                                <field name="department_stats" nolabel="1" widget="text"/>
+                            </group>
+                            <group string="Par mois">
+                                <field name="monthly_stats" nolabel="1" widget="text"/>
+                            </group>
+                        </group>
+
+                        <field name="company_id" invisible="1"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- =================================================== -->
+        <!-- Action de fenêtre — ouvre directement l'enregistrement -->
+        <!-- singleton via get_dashboard()                         -->
+        <!-- =================================================== -->
+        <!-- =================================================== -->
+        <!-- Vue Kanban — tableau de bord en cartes par catégorie  -->
+        <!-- (page d'accueil de l'application, menu "Dashboard")   -->
+        <!-- =================================================== -->
+        <record id="view_approval_category_kanban" model="ir.ui.view">
+            <field name="name">approval.category.kanban.dashboard</field>
+            <field name="model">approval.category</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_dashboard o_approval_dashboard_kanban"
+                        create="false" quick_create="false"
+                        records_draggable="false" edit="false" delete="false">
+                    <field name="name"/>
+                    <field name="icon"/>
+                    <field name="color"/>
+                    <field name="to_review_count"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="o_approval_card">
+                                <a type="edit" class="o_approval_card_menu"
+                                   groups="approval_workflow.group_approval_manager"
+                                   title="Configurer la catégorie">
+                                    <i class="fa fa-ellipsis-v"/>
+                                </a>
+                                <div t-attf-class="o_approval_icon_box o_approval_color_#{record.color.raw_value % 8}">
+                                    <i t-attf-class="fa #{record.icon.raw_value or 'fa-check-square-o'}"/>
+                                </div>
+                                <div class="o_approval_card_body">
+                                    <div class="o_approval_card_name">
+                                        <field name="name"/>
+                                    </div>
+                                    <div class="o_approval_card_actions">
+                                        <button type="object"
+                                                name="action_new_request"
+                                                class="btn btn-sm o_approval_btn_new">
+                                            Nouvelle demande
+                                        </button>
+                                        <button type="object"
+                                                name="action_view_to_review"
+                                                class="btn btn-sm o_approval_btn_review">
+                                            À examiner : <field name="to_review_count"/>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="action_approval_dashboard" model="ir.actions.act_window">
+            <field name="name">Tableau de bord</field>
+            <field name="res_model">approval.category</field>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="view_approval_category_kanban"/>
+            <field name="domain">[('active', '=', True)]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Créez votre première catégorie d'approbation pour la voir ici.
+                </p>
+                <p>
+                    Les catégories se configurent dans Configuration &gt; Catégories.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_approval_dashboard_server" model="ir.actions.server">
+            <field name="name">Tableau de bord</field>
+            <field name="model_id" ref="model_approval_dashboard"/>
+            <field name="state">code</field>
+            <field name="code">
+dashboard = model.get_dashboard()
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Tableau de bord des approbations',
+    'res_model': 'approval.dashboard',
+    'view_mode': 'form',
+    'res_id': dashboard.id,
+    'target': 'current',
+}
+            </field>
+        </record>
+
+    </data>
+</odoo>

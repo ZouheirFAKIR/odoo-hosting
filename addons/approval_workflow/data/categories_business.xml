@@ -1,0 +1,731 @@
+<odoo>
+<data noupdate="0">
+<!--  Les workflows et étapes sont créés inactifs/actifs en toute sécurité ; toutes les étapes sont actives avant les workflows.  -->
+<!--  ACHAT  -->
+<record id="wf_purchase_manager" model="approval.workflow">
+<field name="name">Achat - Responsable</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_purchase_manager_1" model="approval.stage">
+<field name="name">Responsable</field>
+<field name="workflow_id" ref="wf_purchase_manager"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_purchase_purchasing" model="approval.workflow">
+<field name="name">Achat - Responsable + Achats</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_purchase_purchasing_1" model="approval.stage">
+<field name="name">Responsable</field>
+<field name="workflow_id" ref="wf_purchase_purchasing"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_purchase_purchasing_2" model="approval.stage">
+<field name="name">Achats</field>
+<field name="workflow_id" ref="wf_purchase_purchasing"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_purchase_direction" model="approval.workflow">
+<field name="name">Achat - Responsable + Achats + Direction</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_purchase_direction_1" model="approval.stage">
+<field name="name">Responsable</field>
+<field name="workflow_id" ref="wf_purchase_direction"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_purchase_direction_2" model="approval.stage">
+<field name="name">Achats</field>
+<field name="workflow_id" ref="wf_purchase_direction"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_purchase_direction_3" model="approval.stage">
+<field name="name">Direction</field>
+<field name="workflow_id" ref="wf_purchase_direction"/>
+<field name="sequence">30</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="cat_purchase" model="approval.category">
+<field name="name">Demande d'achat</field>
+<field name="code">PURCHASE_REQUEST</field>
+<field name="sequence">100</field>
+<field name="icon">fa-shopping-cart</field>
+<field name="color">2</field>
+<field name="category_type">purchase</field>
+<field name="use_product_lines">True</field>
+<field name="workflow_id" ref="wf_purchase_manager"/>
+<field name="related_model_id" ref="purchase.model_purchase_order"/>
+<field name="final_action_method">action_awe_approve</field>
+<field name="refusal_action_method">action_awe_refuse</field>
+<field name="description">Demande d'achat de matériel, logiciel ou service.</field>
+<field name="active">True</field>
+</record>
+<record id="rule_purchase_high" model="approval.rule">
+<field name="name">Achat > 10000 DH</field>
+<field name="sequence">10</field>
+<field name="category_id" ref="cat_purchase"/>
+<field name="workflow_id" ref="wf_purchase_direction"/>
+<field name="condition_field">amount</field>
+<field name="amount_operator">></field>
+<field name="amount_value">10000</field>
+<field name="active">True</field>
+</record>
+<record id="rule_purchase_medium" model="approval.rule">
+<field name="name">Achat > 2000 DH</field>
+<field name="sequence">20</field>
+<field name="category_id" ref="cat_purchase"/>
+<field name="workflow_id" ref="wf_purchase_purchasing"/>
+<field name="condition_field">amount</field>
+<field name="amount_operator">></field>
+<field name="amount_value">2000</field>
+<field name="active">True</field>
+</record>
+<!--  VENTE  -->
+<record id="wf_sale_commercial" model="approval.workflow">
+<field name="name">Commande - Commercial</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_sale_commercial_1" model="approval.stage">
+<field name="name">Responsable commercial</field>
+<field name="workflow_id" ref="wf_sale_commercial"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_sale_extra" model="approval.workflow">
+<field name="name">Commande - Validation supplémentaire</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_sale_extra_1" model="approval.stage">
+<field name="name">Responsable commercial</field>
+<field name="workflow_id" ref="wf_sale_extra"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_sale_extra_2" model="approval.stage">
+<field name="name">Validation complémentaire</field>
+<field name="workflow_id" ref="wf_sale_extra"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_sale_direction" model="approval.workflow">
+<field name="name">Commande - Responsable + Direction</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_sale_direction_1" model="approval.stage">
+<field name="name">Responsable commercial</field>
+<field name="workflow_id" ref="wf_sale_direction"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_sale_direction_2" model="approval.stage">
+<field name="name">Direction</field>
+<field name="workflow_id" ref="wf_sale_direction"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="cat_sale" model="approval.category">
+<field name="name">Validation de commande</field>
+<field name="code">SALE_VALIDATION</field>
+<field name="sequence">110</field>
+<field name="icon">fa-file-text-o</field>
+<field name="color">4</field>
+<field name="category_type">sale</field>
+<field name="workflow_id" ref="wf_sale_commercial"/>
+<field name="related_model_id" ref="sale.model_sale_order"/>
+<field name="final_action_method">action_awe_approve</field>
+<field name="refusal_action_method">action_awe_refuse</field>
+<field name="description">Validation d'une commande client avant confirmation.</field>
+<field name="active">True</field>
+</record>
+<record id="rule_sale_discount_20" model="approval.rule">
+<field name="name">Remise > 20% -> Direction</field>
+<field name="sequence">5</field>
+<field name="category_id" ref="cat_sale"/>
+<field name="workflow_id" ref="wf_sale_direction"/>
+<field name="condition_field">discount</field>
+<field name="amount_operator">></field>
+<field name="amount_value">20</field>
+<field name="active">True</field>
+</record>
+<record id="rule_sale_amount_high" model="approval.rule">
+<field name="name">Commande > 10000 DH -> Direction</field>
+<field name="sequence">10</field>
+<field name="category_id" ref="cat_sale"/>
+<field name="workflow_id" ref="wf_sale_direction"/>
+<field name="condition_field">amount</field>
+<field name="amount_operator">></field>
+<field name="amount_value">10000</field>
+<field name="active">True</field>
+</record>
+<record id="rule_sale_discount_10" model="approval.rule">
+<field name="name">Remise > 10% -> Validation supplémentaire</field>
+<field name="sequence">20</field>
+<field name="category_id" ref="cat_sale"/>
+<field name="workflow_id" ref="wf_sale_extra"/>
+<field name="condition_field">discount</field>
+<field name="amount_operator">></field>
+<field name="amount_value">10</field>
+<field name="active">True</field>
+</record>
+<!--  CONGÉ  -->
+<record id="wf_leave_manager" model="approval.workflow">
+<field name="name">Congé - Manager</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_leave_manager_1" model="approval.stage">
+<field name="name">Manager</field>
+<field name="workflow_id" ref="wf_leave_manager"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_leave_hr" model="approval.workflow">
+<field name="name">Congé - Manager + RH</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_leave_hr_1" model="approval.stage">
+<field name="name">Manager</field>
+<field name="workflow_id" ref="wf_leave_hr"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_leave_hr_2" model="approval.stage">
+<field name="name">RH</field>
+<field name="workflow_id" ref="wf_leave_hr"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_leave_direction" model="approval.workflow">
+<field name="name">Congé - Manager + RH + Direction</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_leave_direction_1" model="approval.stage">
+<field name="name">Manager</field>
+<field name="workflow_id" ref="wf_leave_direction"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_leave_direction_2" model="approval.stage">
+<field name="name">RH</field>
+<field name="workflow_id" ref="wf_leave_direction"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_leave_direction_3" model="approval.stage">
+<field name="name">Direction</field>
+<field name="workflow_id" ref="wf_leave_direction"/>
+<field name="sequence">30</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="cat_leave" model="approval.category">
+<field name="name">Demande de congé</field>
+<field name="code">LEAVE_REQUEST_2</field>
+<field name="sequence">120</field>
+<field name="icon">fa-plane</field>
+<field name="color">1</field>
+<field name="category_type">leave</field>
+<field name="workflow_id" ref="wf_leave_manager"/>
+<field name="related_model_id" ref="hr_holidays.model_hr_leave"/>
+<field name="final_action_method">action_awe_approve</field>
+<field name="refusal_action_method">action_awe_refuse</field>
+<field name="description">Demande de congé. Workflow déterminé selon la durée.</field>
+<field name="active">True</field>
+</record>
+<record id="rule_leave_high" model="approval.rule">
+<field name="name">Congé > 5 jours</field>
+<field name="sequence">10</field>
+<field name="category_id" ref="cat_leave"/>
+<field name="workflow_id" ref="wf_leave_direction"/>
+<field name="condition_field">duration</field>
+<field name="amount_operator">></field>
+<field name="amount_value">5</field>
+<field name="active">True</field>
+</record>
+<record id="rule_leave_medium" model="approval.rule">
+<field name="name">Congé > 3 jours</field>
+<field name="sequence">20</field>
+<field name="category_id" ref="cat_leave"/>
+<field name="workflow_id" ref="wf_leave_hr"/>
+<field name="condition_field">duration</field>
+<field name="amount_operator">></field>
+<field name="amount_value">3</field>
+<field name="active">True</field>
+</record>
+<!--  DÉPENSE  -->
+<record id="wf_expense_manager" model="approval.workflow">
+<field name="name">Dépense - Manager</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_expense_manager_1" model="approval.stage">
+<field name="name">Manager</field>
+<field name="workflow_id" ref="wf_expense_manager"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_expense_finance" model="approval.workflow">
+<field name="name">Dépense - Manager + Finance</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_expense_finance_1" model="approval.stage">
+<field name="name">Manager</field>
+<field name="workflow_id" ref="wf_expense_finance"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_expense_finance_2" model="approval.stage">
+<field name="name">Finance</field>
+<field name="workflow_id" ref="wf_expense_finance"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_expense_direction" model="approval.workflow">
+<field name="name">Dépense - Manager + Finance + Direction</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_expense_direction_1" model="approval.stage">
+<field name="name">Manager</field>
+<field name="workflow_id" ref="wf_expense_direction"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_expense_direction_2" model="approval.stage">
+<field name="name">Finance</field>
+<field name="workflow_id" ref="wf_expense_direction"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_expense_direction_3" model="approval.stage">
+<field name="name">Direction</field>
+<field name="workflow_id" ref="wf_expense_direction"/>
+<field name="sequence">30</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="cat_expense" model="approval.category">
+<field name="name">Validation de dépense</field>
+<field name="code">EXPENSE_VALIDATION</field>
+<field name="sequence">130</field>
+<field name="icon">fa-credit-card</field>
+<field name="color">6</field>
+<field name="category_type">expense</field>
+<field name="workflow_id" ref="wf_expense_manager"/>
+<field name="related_model_id" ref="hr_expense.model_hr_expense"/>
+<field name="final_action_method">action_awe_approve</field>
+<field name="refusal_action_method">action_awe_refuse</field>
+<field name="description">Validation d'une note de dépense. Workflow déterminé selon le montant.</field>
+<field name="active">True</field>
+</record>
+<record id="rule_expense_high" model="approval.rule">
+<field name="name">Dépense > 2000 DH</field>
+<field name="sequence">10</field>
+<field name="category_id" ref="cat_expense"/>
+<field name="workflow_id" ref="wf_expense_direction"/>
+<field name="condition_field">amount</field>
+<field name="amount_operator">></field>
+<field name="amount_value">2000</field>
+<field name="active">True</field>
+</record>
+<record id="rule_expense_medium" model="approval.rule">
+<field name="name">Dépense > 500 DH</field>
+<field name="sequence">20</field>
+<field name="category_id" ref="cat_expense"/>
+<field name="workflow_id" ref="wf_expense_finance"/>
+<field name="condition_field">amount</field>
+<field name="amount_operator">></field>
+<field name="amount_value">500</field>
+<field name="active">True</field>
+</record>
+<!--  FORMATION  -->
+<record id="wf_training_manager" model="approval.workflow">
+<field name="name">Formation - Manager</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_training_manager_1" model="approval.stage">
+<field name="name">Manager</field>
+<field name="workflow_id" ref="wf_training_manager"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_training_hr" model="approval.workflow">
+<field name="name">Formation - Manager + RH</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_training_hr_1" model="approval.stage">
+<field name="name">Manager</field>
+<field name="workflow_id" ref="wf_training_hr"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_training_hr_2" model="approval.stage">
+<field name="name">RH</field>
+<field name="workflow_id" ref="wf_training_hr"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_training_direction" model="approval.workflow">
+<field name="name">Formation - Manager + RH + Direction</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_training_direction_1" model="approval.stage">
+<field name="name">Manager</field>
+<field name="workflow_id" ref="wf_training_direction"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_training_direction_2" model="approval.stage">
+<field name="name">RH</field>
+<field name="workflow_id" ref="wf_training_direction"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_training_direction_3" model="approval.stage">
+<field name="name">Direction</field>
+<field name="workflow_id" ref="wf_training_direction"/>
+<field name="sequence">30</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="cat_training" model="approval.category">
+<field name="name">Demande de formation</field>
+<field name="code">TRAINING_REQUEST</field>
+<field name="sequence">140</field>
+<field name="icon">fa-graduation-cap</field>
+<field name="color">7</field>
+<field name="category_type">training</field>
+<field name="workflow_id" ref="wf_training_hr"/>
+<field name="related_model_id" ref="website_slides.model_slide_channel"/>
+<field name="final_action_method">action_awe_approve</field>
+<field name="refusal_action_method">action_awe_refuse</field>
+<field name="description">Demande de formation interne, externe ou en ligne. Peut être liée à un cours eLearning (module website_slides).</field>
+<field name="active">True</field>
+</record>
+<record id="rule_training_high_cost" model="approval.rule">
+<field name="name">Coût > 5000 DH</field>
+<field name="sequence">5</field>
+<field name="category_id" ref="cat_training"/>
+<field name="workflow_id" ref="wf_training_direction"/>
+<field name="condition_field">amount</field>
+<field name="amount_operator">></field>
+<field name="amount_value">5000</field>
+<field name="active">True</field>
+</record>
+<record id="rule_training_internal" model="approval.rule">
+<field name="name">Formation interne</field>
+<field name="sequence">10</field>
+<field name="category_id" ref="cat_training"/>
+<field name="workflow_id" ref="wf_training_manager"/>
+<field name="training_type_value">internal</field>
+<field name="active">True</field>
+</record>
+<record id="rule_training_external" model="approval.rule">
+<field name="name">Formation externe</field>
+<field name="sequence">20</field>
+<field name="category_id" ref="cat_training"/>
+<field name="workflow_id" ref="wf_training_hr"/>
+<field name="training_type_value">external</field>
+<field name="active">True</field>
+</record>
+<!--  STOCK  -->
+<record id="demo_stock_location_secure" model="stock.location">
+<field name="name">Zone Sécurisée</field>
+<field name="location_id" ref="stock.stock_location_locations"/>
+<field name="usage">internal</field>
+</record>
+<record id="wf_stock_normal" model="approval.workflow">
+<field name="name">Stock - Magasinier</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_stock_normal_1" model="approval.stage">
+<field name="name">Magasinier</field>
+<field name="workflow_id" ref="wf_stock_normal"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_stock_responsible" model="approval.workflow">
+<field name="name">Stock - Magasinier + Responsable Stock</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_stock_responsible_1" model="approval.stage">
+<field name="name">Magasinier</field>
+<field name="workflow_id" ref="wf_stock_responsible"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_stock_responsible_2" model="approval.stage">
+<field name="name">Responsable Stock</field>
+<field name="workflow_id" ref="wf_stock_responsible"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="wf_stock_secure" model="approval.workflow">
+<field name="name">Stock - Validation Renforcée (Emplacement Sensible)</field>
+<field name="validation_type">sequential</field>
+<field name="active">False</field>
+</record>
+<record id="st_stock_secure_1" model="approval.stage">
+<field name="name">Magasinier</field>
+<field name="workflow_id" ref="wf_stock_secure"/>
+<field name="sequence">10</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_stock_secure_2" model="approval.stage">
+<field name="name">Responsable Stock</field>
+<field name="workflow_id" ref="wf_stock_secure"/>
+<field name="sequence">20</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="st_stock_secure_3" model="approval.stage">
+<field name="name">Direction</field>
+<field name="workflow_id" ref="wf_stock_secure"/>
+<field name="sequence">30</field>
+<field name="approver_type">user</field>
+<field name="approver_user_id" ref="base.user_admin"/>
+<field name="min_approvals">1</field>
+<field name="is_blocking">True</field>
+<field name="active">True</field>
+</record>
+<record id="cat_stock" model="approval.category">
+<field name="name">Transfert de stock</field>
+<field name="code">STOCK_TRANSFER</field>
+<field name="sequence">150</field>
+<field name="icon">fa-truck</field>
+<field name="color">3</field>
+<field name="category_type">stock</field>
+<field name="use_product_lines">True</field>
+<field name="workflow_id" ref="wf_stock_normal"/>
+<field name="related_model_id" ref="stock.model_stock_picking"/>
+<field name="final_action_method">action_awe_approve</field>
+<field name="refusal_action_method">action_awe_refuse</field>
+<field name="description">Demande de transfert de stock entre deux emplacements.</field>
+<field name="active">True</field>
+</record>
+<record id="rule_stock_secure_location" model="approval.rule">
+<field name="name">Emplacement sensible</field>
+<field name="sequence">5</field>
+<field name="category_id" ref="cat_stock"/>
+<field name="workflow_id" ref="wf_stock_secure"/>
+<field name="stock_location_id" ref="demo_stock_location_secure"/>
+<field name="active">True</field>
+</record>
+<record id="rule_stock_quantity" model="approval.rule">
+<field name="name">Quantité > 10</field>
+<field name="sequence">10</field>
+<field name="category_id" ref="cat_stock"/>
+<field name="workflow_id" ref="wf_stock_responsible"/>
+<field name="condition_field">quantity</field>
+<field name="amount_operator">></field>
+<field name="amount_value">10</field>
+<field name="active">True</field>
+</record>
+<!--  ACTIVATION FINALE  -->
+<record id="wf_purchase_manager" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_purchase_purchasing" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_purchase_direction" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_sale_commercial" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_sale_extra" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_sale_direction" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_leave_manager" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_leave_hr" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_leave_direction" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_expense_manager" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_expense_finance" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_expense_direction" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_training_manager" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_training_hr" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_training_direction" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_stock_normal" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_stock_responsible" model="approval.workflow">
+<field name="active">True</field>
+</record>
+<record id="wf_stock_secure" model="approval.workflow">
+<field name="active">True</field>
+</record>
+</data>
+</odoo>

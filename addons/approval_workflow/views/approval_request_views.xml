@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <!-- ========================================================= -->
+    <!-- LIST -->
+    <!-- ========================================================= -->
+
+    <record id="view_approval_request_list" model="ir.ui.view">
+        <field name="name">approval.request.list</field>
+        <field name="model">approval.request</field>
+        <field name="arch" type="xml">
+
+            <list string="Demandes d'approbation">
+
+                <field name="name"/>
+                <field name="requester_id"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="category_id"/>
+                <field name="category_type" column_invisible="True"/>
+                <field name="priority" widget="priority" optional="show"/>
+                <field name="date_request"/>
+                <field name="amount"/>
+                <field name="current_stage_id"/>
+                <field name="state"/>
+                <field name="can_current_user_approve"
+                       column_invisible="True"/>
+
+            </list>
+
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- KANBAN -->
+    <!-- ========================================================= -->
+
+    <record id="view_approval_request_kanban" model="ir.ui.view">
+        <field name="name">approval.request.kanban</field>
+        <field name="model">approval.request</field>
+        <field name="arch" type="xml">
+
+            <kanban
+                string="Demandes d'approbation"
+                default_group_by="state"
+                class="o_kanban_small_column"
+                quick_create="false">
+
+                <field name="name"/>
+                <field name="requester_id"/>
+                <field name="category_id"/>
+                <field name="current_stage_id"/>
+                <field name="priority"/>
+                <field name="amount"/>
+                <field name="currency_id"/>
+                <field name="date_request"/>
+                <field name="state"/>
+                <field name="can_current_user_approve"/>
+
+                <templates>
+                    <t t-name="card">
+
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click #{record.can_current_user_approve.raw_value ? 'border-start border-4 border-warning' : ''}">
+
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                                <field name="priority" widget="priority"/>
+                            </div>
+
+                            <div class="o_kanban_record_body">
+                                <field name="category_id"/>
+                                <br/>
+                                <span t-if="record.current_stage_id.value">
+                                    <i class="fa fa-flag-checkered" title="Étape"/>
+                                    <t t-esc="record.current_stage_id.value"/>
+                                </span>
+                            </div>
+
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="amount" widget="monetary"
+                                           t-if="record.amount.raw_value"/>
+                                    <span t-if="record.date_request.value">
+                                        <t t-esc="record.date_request.value"/>
+                                    </span>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="requester_id" widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </t>
+                </templates>
+
+            </kanban>
+
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- FORM -->
+    <!-- ========================================================= -->
+
+    <record id="view_approval_request_form" model="ir.ui.view">
+        <field name="name">approval.request.form</field>
+        <field name="model">approval.request</field>
+        <field name="arch" type="xml">
+
+            <form string="Demande d'approbation">
+
+                <header>
+
+                    <button
+                        name="action_submit"
+                        type="object"
+                        string="Soumettre"
+                        class="btn-primary"
+                        invisible="state != 'draft'"/>
+
+                    <button
+                        name="action_approve"
+                        type="object"
+                        string="Approuver"
+                        class="btn-success"
+                        invisible="state != 'in_progress'"/>
+
+                    <button
+                        name="action_refuse"
+                        type="object"
+                        string="Refuser"
+                        class="btn-danger"
+                        confirm="Confirmer le refus ? Pensez à renseigner le champ 'Reason' ci-dessous pour informer le demandeur du motif."
+                        invisible="state != 'in_progress'"/>
+
+                    <button
+                        name="action_cancel"
+                        type="object"
+                        string="Annuler"
+                        invisible="state in ('approved', 'refused', 'cancelled')"/>
+
+                    <button
+                        name="action_reset_to_draft"
+                        type="object"
+                        string="Remettre en brouillon"
+                        invisible="state not in ('cancelled', 'refused')"/>
+
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,in_progress,approved,refused"/>
+
+                </header>
+
+                <sheet>
+
+                    <widget name="web_ribbon" title="Urgent"
+                            bg_color="text-bg-danger"
+                            invisible="priority != '2'"/>
+
+                    <div class="oe_button_box" name="button_box">
+
+                        <button
+                            name="action_view_approvals"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-check">
+
+                            <field
+                                name="approval_count"
+                                widget="statinfo"
+                                string="Approbations"/>
+
+                        </button>
+
+                        <button
+                            name="action_view_history"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-history">
+
+                            <field
+                                name="history_count"
+                                widget="statinfo"
+                                string="Historique"/>
+
+                        </button>
+
+                        <button
+                            name="action_view_related_document"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-external-link"
+                            invisible="not related_document_name">
+
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Document lié</span>
+                                <field name="related_document_name"
+                                       class="o_stat_value"/>
+                            </div>
+
+                        </button>
+
+                    </div>
+
+                    <div class="oe_title">
+
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+
+                    </div>
+
+                    <group>
+
+                        <group>
+
+                            <field name="category_id"/>
+                            <field name="category_type" invisible="1"/>
+                            <field name="category_use_product_lines" invisible="1"/>
+                            <field name="workflow_id"/>
+                            <field name="priority" widget="priority"/>
+
+                        </group>
+
+                        <group>
+
+                            <field name="requester_id"/>
+                            <field name="employee_id"/>
+                            <field name="department_id"/>
+                            <field name="date_request"/>
+
+                        </group>
+
+                    </group>
+
+                    <group invisible="category_type != 'generic'">
+                        <field name="amount"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+
+                    <!-- ===================================== -->
+                    <!-- DEMANDE D'ACHAT                        -->
+                    <!-- ===================================== -->
+                    <group string="Détails — Demande d'achat"
+                           invisible="category_type != 'purchase'">
+                        <group>
+                            <field name="vendor_id" string="Fournisseur"/>
+                            <field name="requested_date"/>
+                        </group>
+                        <group>
+                            <field name="amount" readonly="category_use_product_lines"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <!-- ===================================== -->
+                    <!-- VALIDATION DE COMMANDE                 -->
+                    <!-- ===================================== -->
+                    <group string="Détails — Validation de commande"
+                           invisible="category_type != 'sale'">
+                        <group>
+                            <field name="sale_order_id"/>
+                            <field name="partner_id" string="Client"/>
+                            <field name="salesperson_id"/>
+                            <field name="order_date"/>
+                            <field name="requested_delivery_date"/>
+                        </group>
+                        <group>
+                            <field name="amount_untaxed"/>
+                            <field name="tax_amount"/>
+                            <field name="amount" string="Montant total"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="discount"/>
+                        </group>
+                    </group>
+
+                    <!-- ===================================== -->
+                    <!-- DEMANDE DE CONGÉ                       -->
+                    <!-- ===================================== -->
+                    <group string="Détails — Demande de congé"
+                           invisible="category_type != 'leave'">
+                        <group>
+                            <field name="holiday_type_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="duration" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="location"/>
+                            <field name="leave_id"/>
+                        </group>
+                    </group>
+
+                    <!-- ===================================== -->
+                    <!-- VALIDATION DE DÉPENSE                  -->
+                    <!-- ===================================== -->
+                    <group string="Détails — Validation de dépense"
+                           invisible="category_type != 'expense'">
+                        <group>
+                            <field name="expense_type"/>
+                            <field name="expense_date"/>
+                            <field name="vendor_id" string="Fournisseur"/>
+                            <field name="payment_method"/>
+                        </group>
+                        <group>
+                            <field name="amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="receipt" filename="receipt_filename"/>
+                            <field name="receipt_filename" invisible="1"/>
+                            <field name="expense_id"/>
+                        </group>
+                    </group>
+
+                    <!-- ===================================== -->
+                    <!-- DEMANDE DE FORMATION                   -->
+                    <!-- ===================================== -->
+                    <group string="Détails — Demande de formation"
+                           invisible="category_type != 'training'">
+                        <group>
+                            <field name="training_name"/>
+                            <field name="training_type"/>
+                            <field name="vendor_id" string="Organisme"/>
+                            <field name="location"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="duration" readonly="1"/>
+                            <field name="amount" string="Coût"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <!-- ===================================== -->
+                    <!-- TRANSFERT DE STOCK                     -->
+                    <!-- ===================================== -->
+                    <group string="Détails — Transfert de stock"
+                           invisible="category_type != 'stock'">
+                        <group>
+                            <field name="source_location_id"/>
+                            <field name="destination_location_id"/>
+                            <field name="scheduled_date"/>
+                        </group>
+                        <group>
+                            <field name="picking_id"/>
+                        </group>
+                    </group>
+
+                    <group>
+
+                        <field name="current_stage_id"
+                               readonly="1"/>
+
+                        <field name="can_current_user_approve"
+                               readonly="1"/>
+
+                    </group>
+
+                    <notebook>
+
+                        <page string="Description">
+
+                            <field name="description"/>
+
+                            <label for="justification"
+                                   invisible="category_type not in ('purchase', 'expense', 'training')"/>
+                            <field name="justification"
+                                   invisible="category_type not in ('purchase', 'expense', 'training')"/>
+
+                            <label for="reason"
+                                   invisible="category_type not in ('leave', 'stock')"/>
+                            <field name="reason"
+                                   invisible="category_type not in ('leave', 'stock')"/>
+
+                            <label for="objective"
+                                   invisible="category_type != 'training'"/>
+                            <field name="objective"
+                                   invisible="category_type != 'training'"/>
+
+                            <label for="comment"/>
+                            <field name="comment"/>
+
+                        </page>
+
+                        <page string="Produits / Stock"
+                              invisible="category_type not in ('purchase', 'stock') and not category_use_product_lines">
+
+                            <field name="line_ids">
+
+                                <list editable="bottom">
+
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="product_uom_id"
+                                           column_invisible="parent.category_type != 'stock'"/>
+                                    <field name="price_unit"
+                                           column_invisible="parent.category_type == 'stock'"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="subtotal"
+                                           column_invisible="parent.category_type == 'stock'"/>
+
+                                </list>
+
+                            </field>
+
+                        </page>
+
+                        <page string="Lignes d'approbation">
+
+                            <field name="approval_line_ids">
+
+                                <list>
+
+                                    <field name="stage_id"/>
+                                    <field name="approver_id"/>
+                                    <field name="state"/>
+                                    <field name="action_date"/>
+                                    <field name="comment"/>
+
+                                </list>
+
+                            </field>
+
+                        </page>
+
+                        <page string="Historique">
+
+                            <field name="history_ids">
+
+                                <list>
+
+                                    <field name="action_date"/>
+                                    <field name="user_id"/>
+                                    <field name="action"/>
+                                    <field name="description"/>
+
+                                </list>
+
+                            </field>
+
+                        </page>
+
+                    </notebook>
+
+                    <div class="oe_chatter">
+
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+
+                    </div>
+
+                </sheet>
+
+            </form>
+
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- SEARCH -->
+    <!-- ========================================================= -->
+
+    <record id="view_approval_request_search" model="ir.ui.view">
+        <field name="name">approval.request.search</field>
+        <field name="model">approval.request</field>
+        <field name="arch" type="xml">
+
+            <search string="Demandes d'approbation">
+
+                <field name="name"/>
+                <field name="requester_id"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="category_id"/>
+                <field name="workflow_id"/>
+                <field name="state"/>
+
+                <filter
+                    string="Mes demandes"
+                    name="filter_mine"
+                    domain="[('requester_id', '=', uid)]"/>
+
+                <filter
+                    string="À approuver par moi"
+                    name="filter_to_approve"
+                    domain="[('can_current_user_approve', '=', True)]"/>
+
+                <separator/>
+
+                <filter
+                    string="Urgentes"
+                    name="filter_urgent"
+                    domain="[('priority', '=', '2')]"/>
+
+                <separator/>
+
+                <filter
+                    string="Brouillon"
+                    name="filter_draft"
+                    domain="[('state', '=', 'draft')]"/>
+
+                <filter
+                    string="En cours"
+                    name="filter_progress"
+                    domain="[('state', '=', 'in_progress')]"/>
+
+                <filter
+                    string="Approuvées"
+                    name="filter_approved"
+                    domain="[('state', '=', 'approved')]"/>
+
+                <filter
+                    string="Refusées"
+                    name="filter_refused"
+                    domain="[('state', '=', 'refused')]"/>
+
+                <group>
+
+                    <filter
+                        string="Catégorie"
+                        name="group_category"
+                        context="{'group_by': 'category_id'}"/>
+
+                    <filter
+                        string="Type de catégorie"
+                        name="group_category_type"
+                        context="{'group_by': 'category_type'}"/>
+
+                    <filter
+                        string="Statut"
+                        name="group_state"
+                        context="{'group_by': 'state'}"/>
+
+                    <filter
+                        string="Demandeur"
+                        name="group_requester"
+                        context="{'group_by': 'requester_id'}"/>
+
+                </group>
+
+            </search>
+
+        </field>
+    </record>
+
+</odoo>

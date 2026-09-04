@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <!--
+        ATTENTION : l'ID de la vue formulaire backend native de
+        slide.channel (website_slides.slide_channel_view_form) n'a
+        pas pu être vérifié à 100% sans accès direct à votre
+        installation. Si la mise à jour du module échoue avec une
+        erreur du type "View not found" ou "External ID not found"
+        sur cette référence, activez le mode développeur, ouvrez un
+        cours dans Site Web > eLearning > Cours, cliquez sur
+        l'icône bogue (debug) > "Modifier Vue: Formulaire", et
+        remplacez la valeur de inherit_id ci-dessous par l'ID
+        technique affiché.
+    -->
+
+    <record id="view_slide_channel_form_inherit_approval" model="ir.ui.view">
+        <field name="name">slide.channel.form.inherit.approval</field>
+        <field name="model">slide.channel</field>
+        <field name="inherit_id" ref="website_slides.view_slide_channel_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+
+                <button
+                    name="action_submit_for_approval"
+                    type="object"
+                    string="Soumettre pour approbation"
+                    class="btn-primary"
+                    invisible="awe_approval_state in ('draft', 'in_progress')"/>
+
+            </xpath>
+
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+
+                <button
+                    name="action_view_approval_request"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-check-square-o"
+                    invisible="not approval_request_id">
+
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Approbation</span>
+                        <field name="awe_approval_state" class="o_stat_value"/>
+                    </div>
+
+                </button>
+
+            </xpath>
+
+            <xpath expr="//header" position="inside">
+
+                <field
+                    name="awe_training_state"
+                    widget="badge"
+                    invisible="not approval_request_id"
+                    decoration-success="awe_training_state == 'confirmed'"
+                    decoration-danger="awe_training_state == 'cancelled'"
+                    decoration-info="awe_training_state == 'to_confirm'"/>
+
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <!-- ========================================================= -->
+    <!-- ACTION MES APPROBATIONS (demandes créées par l'utilisateur actuel) -->
+    <!-- ========================================================= -->
+
+    <record id="action_approval_my_requests" model="ir.actions.act_window">
+        <field name="name">Mes approbations</field>
+        <field name="res_model">approval.request</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_approval_request_kanban')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_approval_request_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_approval_request_form')}),
+        ]"/>
+        <field name="search_view_id" ref="view_approval_request_search"/>
+        <field name="domain">[('requester_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première demande d'approbation.
+            </p>
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- ACTION MANAGER (demandes en attente de l'utilisateur actuel)  -->
+    <!-- ========================================================= -->
+
+    <record id="action_approval_manager" model="ir.actions.act_window">
+        <field name="name">Manager</field>
+        <field name="res_model">approval.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_approval_request_list"/>
+        <field name="search_view_id" ref="view_approval_request_search"/>
+        <field name="domain">[('can_current_user_approve', '=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune demande n'est actuellement en attente de votre approbation.
+            </p>
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- ACTION TOUTES LES DEMANDES (liste complète, managers/admins)  -->
+    <!-- ========================================================= -->
+
+    <record id="action_approval_requests" model="ir.actions.act_window">
+        <field name="name">Toutes les demandes</field>
+        <field name="res_model">approval.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_approval_request_list"/>
+        <field name="search_view_id" ref="view_approval_request_search"/>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- ACTION CATÉGORIES                                        -->
+    <!-- ========================================================= -->
+
+    <record id="action_approval_categories" model="ir.actions.act_window">
+        <field name="name">Catégories d'approbation</field>
+        <field name="res_model">approval.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- ACTION WORKFLOWS                                         -->
+    <!-- ========================================================= -->
+
+    <record id="action_approval_workflows" model="ir.actions.act_window">
+        <field name="name">Workflows d'approbation</field>
+        <field name="res_model">approval.workflow</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- ACTION ÉTAPES                                            -->
+    <!-- ========================================================= -->
+
+    <record id="action_approval_stages" model="ir.actions.act_window">
+        <field name="name">Étapes d'approbation</field>
+        <field name="res_model">approval.stage</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- APPLICATION RACINE                                       -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_root"
+        name="Approbations"
+        web_icon="approval_workflow,static/description/icon.png"
+        sequence="10"
+        groups="approval_workflow.group_approval_user"/>
+
+
+    <!-- ========================================================= -->
+    <!-- TABLEAU DE BORD                                          -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_dashboard"
+        name="Tableau de bord"
+        parent="menu_approval_root"
+        action="action_approval_dashboard"
+        sequence="1"
+        groups="approval_workflow.group_approval_user"/>
+
+
+    <!-- ========================================================= -->
+    <!-- MES APPROBATIONS                                         -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_my_requests"
+        name="Mes approbations"
+        parent="menu_approval_root"
+        action="action_approval_my_requests"
+        sequence="10"
+        groups="approval_workflow.group_approval_user"/>
+
+
+    <!-- ========================================================= -->
+    <!-- MANAGER                                                   -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_manager"
+        name="Manager"
+        parent="menu_approval_root"
+        action="action_approval_manager"
+        sequence="20"
+        groups="approval_workflow.group_approval_manager"/>
+
+
+    <!-- ========================================================= -->
+    <!-- CONFIGURATION                                             -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_configuration"
+        name="Configuration"
+        parent="menu_approval_root"
+        sequence="90"
+        groups="approval_workflow.group_approval_manager"/>
+
+
+    <!-- ========================================================= -->
+    <!-- CATÉGORIES                                                -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_categories"
+        name="Catégories"
+        parent="menu_approval_configuration"
+        action="action_approval_categories"
+        sequence="10"
+        groups="approval_workflow.group_approval_manager"/>
+
+
+    <!-- ========================================================= -->
+    <!-- WORKFLOWS                                                 -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_workflows"
+        name="Workflows"
+        parent="menu_approval_configuration"
+        action="action_approval_workflows"
+        sequence="20"
+        groups="approval_workflow.group_approval_manager"/>
+
+
+    <!-- ========================================================= -->
+    <!-- ÉTAPES                                                    -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_stages"
+        name="Étapes"
+        parent="menu_approval_configuration"
+        action="action_approval_stages"
+        sequence="30"
+        groups="approval_workflow.group_approval_manager"/>
+
+
+    <!-- ========================================================= -->
+    <!-- RÈGLES                                                    -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_rules"
+        name="Règles"
+        parent="menu_approval_configuration"
+        action="action_approval_rule"
+        sequence="40"
+        groups="approval_workflow.group_approval_manager"/>
+
+
+    <!-- ========================================================= -->
+    <!-- TOUTES LES DEMANDES                                      -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_all_requests"
+        name="Toutes les demandes"
+        parent="menu_approval_configuration"
+        action="action_approval_requests"
+        sequence="50"
+        groups="approval_workflow.group_approval_manager"/>
+
+
+    <!-- ========================================================= -->
+    <!-- STATISTIQUES (formulaire KPI, conservé de l'ancien tableau de bord) -->
+    <!-- ========================================================= -->
+
+    <menuitem
+        id="menu_approval_statistics"
+        name="Statistiques"
+        parent="menu_approval_configuration"
+        action="action_approval_dashboard_server"
+        sequence="60"
+        groups="approval_workflow.group_approval_manager"/>
+
+</odoo>

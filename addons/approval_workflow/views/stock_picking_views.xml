@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="view_stock_picking_form_inherit_approval" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.approval</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+
+                <button
+                    name="action_submit_for_approval"
+                    type="object"
+                    string="Soumettre pour approbation"
+                    class="btn-primary"
+                    invisible="state in ('done', 'cancel') or approval_state in ('draft', 'in_progress')"/>
+
+                <button
+                    name="action_view_approval_request"
+                    type="object"
+                    string="Voir la demande d'approbation"
+                    class="btn-secondary"
+                    invisible="not approval_request_id"/>
+
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

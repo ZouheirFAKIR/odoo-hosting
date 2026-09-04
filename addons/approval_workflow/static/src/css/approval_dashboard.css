@@ -1,0 +1,112 @@
+/* Moteur de workflow d'approbation - Style des cartes du tableau de bord */
+
+.o_approval_dashboard_kanban.o_kanban_dashboard .o_kanban_record {
+    width: 23%;
+    min-width: 250px;
+    margin: 0.5% 1% 1% 0;
+}
+
+@media (max-width: 1200px) {
+    .o_approval_dashboard_kanban.o_kanban_dashboard .o_kanban_record {
+        width: 31%;
+    }
+}
+
+@media (max-width: 768px) {
+    .o_approval_dashboard_kanban.o_kanban_dashboard .o_kanban_record {
+        width: 100%;
+    }
+}
+
+.o_approval_card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 4px 0;
+}
+
+.o_approval_card_menu {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    color: #adb5bd;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+.o_approval_card_menu:hover {
+    color: #6c757d;
+}
+
+.o_approval_icon_box {
+    flex: 0 0 56px;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #ffffff;
+}
+
+.o_approval_card_body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.o_approval_card_name {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 10px;
+    color: #212529;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.o_approval_card_actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.o_approval_btn_new {
+    background-color: #714B67;
+    border-color: #714B67;
+    color: #fff;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.o_approval_btn_new:hover {
+    background-color: #5b3b54;
+    border-color: #5b3b54;
+    color: #fff;
+}
+
+.o_approval_btn_review {
+    background-color: #f1f1f1;
+    border: none;
+    color: #495057;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.o_approval_btn_review:hover {
+    background-color: #e2e2e2;
+    color: #495057;
+}
+
+/* Couleurs d'accentuation cycliques pour les icônes de catégorie (champ color 0-7) */
+.o_approval_color_0 { background-color: #714B67; }
+.o_approval_color_1 { background-color: #4D79A6; }
+.o_approval_color_2 { background-color: #E6842E; }
+.o_approval_color_3 { background-color: #3F9C6D; }
+.o_approval_color_4 { background-color: #C25656; }
+.o_approval_color_5 { background-color: #8E6FCE; }
+.o_approval_color_6 { background-color: #2C9AA6; }
+.o_approval_color_7 { background-color: #B08A2E; }

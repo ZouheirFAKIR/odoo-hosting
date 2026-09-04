@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <!-- Utilisateur Approbation -->
+    <record id="group_approval_user" model="res.groups">
+        <field name="name">Utilisateur Approbation</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+    </record>
+
+    <!-- Manager Approbation -->
+    <record id="group_approval_manager" model="res.groups">
+        <field name="name">Manager Approbation</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+        <field name="implied_ids"
+               eval="[(4, ref('approval_workflow.group_approval_user'))]"/>
+    </record>
+
+    <!-- Administrateur Approbation -->
+    <record id="group_approval_admin" model="res.groups">
+        <field name="name">Administrateur Approbation</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+        <field name="implied_ids"
+               eval="[(4, ref('approval_workflow.group_approval_manager'))]"/>
+        <field name="users"
+               eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+
+</odoo>

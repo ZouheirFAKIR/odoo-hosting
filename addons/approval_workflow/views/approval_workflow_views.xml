@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="view_approval_workflow_list" model="ir.ui.view">
+        <field name="name">approval.workflow.list</field>
+        <field name="model">approval.workflow</field>
+        <field name="arch" type="xml">
+
+            <list string="Workflows d'approbation">
+
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="validation_type"/>
+                <field name="stage_count"/>
+                <field name="request_count"/>
+                <field name="company_id"/>
+                <field name="active"/>
+
+            </list>
+
+        </field>
+    </record>
+
+
+    <record id="view_approval_workflow_form" model="ir.ui.view">
+        <field name="name">approval.workflow.form</field>
+        <field name="model">approval.workflow</field>
+        <field name="arch" type="xml">
+
+            <form string="Workflow d'approbation">
+
+                <header/>
+
+                <sheet>
+
+                    <div class="oe_button_box" name="button_box">
+
+                        <button
+                            name="action_view_stages"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-tasks">
+
+                            <field
+                                name="stage_count"
+                                widget="statinfo"
+                                string="Étapes"/>
+
+                        </button>
+
+                        <button
+                            name="action_view_requests"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-file-text">
+
+                            <field
+                                name="request_count"
+                                widget="statinfo"
+                                string="Demandes"/>
+
+                        </button>
+
+                    </div>
+
+                    <group>
+
+                        <group>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                            <field name="validation_type"/>
+                        </group>
+
+                        <group>
+                            <field name="company_id"/>
+                            <field name="active"/>
+                        </group>
+
+                    </group>
+
+                    <notebook>
+
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+
+                        <page string="Étapes d'approbation">
+
+                            <field name="stage_ids">
+
+                                <list editable="bottom">
+
+                                    <field name="sequence"/>
+                                    <field name="name"/>
+                                    <field name="approver_type"/>
+                                    <field name="approver_user_id"/>
+                                    <field name="approver_group_id"/>
+                                    <field name="min_approvals"/>
+                                    <field name="is_blocking"/>
+                                    <field name="active"/>
+
+                                </list>
+
+                            </field>
+
+                        </page>
+
+                        <page string="Catégories">
+
+                            <field name="category_ids">
+
+                                <list>
+
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="active"/>
+
+                                </list>
+
+                            </field>
+
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+
+            </form>
+
+        </field>
+    </record>
+
+
+    <record id="view_approval_workflow_search" model="ir.ui.view">
+        <field name="name">approval.workflow.search</field>
+        <field name="model">approval.workflow</field>
+        <field name="arch" type="xml">
+
+            <search>
+
+                <field name="name"/>
+                <field name="validation_type"/>
+
+                <filter
+                    string="Actif"
+                    name="filter_active"
+                    domain="[('active', '=', True)]"/>
+
+            </search>
+
+        </field>
+    </record>
+
+</odoo>
